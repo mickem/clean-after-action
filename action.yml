@@ -1,5 +1,9 @@
 name: 'Clean after'
 description: 'Cleans up the workspace after build finishes'
+author: 'mickem'
+branding:
+  icon: 'delete'
+  color: 'red'
 runs:
   using: 'node12'
   main: 'index.js'
