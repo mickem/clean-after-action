@@ -5,7 +5,7 @@ Cleanup the work directory for self hosted runners after they finish building.
 ## Example usage
 
 ```yaml
-- uses: mickem/clean-after-action@v1.0.1
+- uses: mickem/clean-after-action@v1
 ```
 
 It is important that this is run before any caching tasks as cleanups are run in reverse order.
