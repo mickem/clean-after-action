@@ -26,5 +26,5 @@ jobs:
         uses: technote-space/release-github-actions@v6
         with:
           BRANCH_NAME: releases/${MAJOR}
-          CLEAN_TARGETS: '[!.]*,__tests__,docs,src,*.ts,*.json,*.lock,*.yml,*.yaml'
+          CLEAN_TARGETS: '.gitignore,.github,*.lock'
           COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
