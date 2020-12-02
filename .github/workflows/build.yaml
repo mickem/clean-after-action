@@ -10,9 +10,21 @@ jobs:
         uses: actions/checkout@v2
       - name: Install
         run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Test
-        run: npm run test
-      - name: Format
-        run: npm run fmtcheck
+
+  release:
+    name: Release
+    needs: [build]
+    if: contains(github.ref, 'tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Version
+        id: get_tag
+        run: echo ::set-output name=version::${TAG_REF_NAME##*/}
+        env:
+          TAG_REF_NAME: ${{ github.ref }}
+      - name: Release GitHub Actions
+        uses: technote-space/release-github-actions@v6
+        with:
+          BRANCH_NAME: releases/${MAJOR}
+          CLEAN_TARGETS: [!.]*,__tests__,docs,src,*.ts,*.json,*.lock,*.yml,*.yaml
+          COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
