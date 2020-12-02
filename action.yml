@@ -1,0 +1,6 @@
+name: 'Clean after'
+description: 'Cleans up the workspace after build finishes'
+runs:
+  using: 'node12'
+  main: 'index.js'
+  post: 'cleanup.js'

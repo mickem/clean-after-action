@@ -1,0 +1,11 @@
+{
+  "name": "cleanup-after",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Michael Medin <michael@medin.name>",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "1.2.3",
+    "@actions/io": "^1.0.2"
+  }
+}
