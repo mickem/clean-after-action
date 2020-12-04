@@ -10,6 +10,29 @@ Cleanup the work directory for self hosted runners after they finish building.
 
 It is important that this is run before any caching tasks as cleanups are run in reverse order (and you do not want to cleanup before the caching is saved).
 
+A more full example:
+```yaml
+jobs:
+  build:
+    runs-on: onprem
+    steps:
+    - uses: mickem/clean-after-action@v1
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+    # ....
+```
+## Inputs
+
+### keepGit
+
+Set this to true to prevent the `.git ` folder to be deleted.
+
+```yaml
+- uses: mickem/clean-after-action@v1
+  with:
+    keepGit: true
+```
+
 ## What about docker actions?
 
 If you use docker actions files will be created by "root" and this action will fail to delete generated files.
