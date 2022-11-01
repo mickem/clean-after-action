@@ -9,6 +9,6 @@ inputs:
     description: 'Keep the .git folder to speedup cloning'
     required: false
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'
   post: 'cleanup.js'
