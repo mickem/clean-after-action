@@ -1,41 +1,43 @@
-# Cleanup after build
+# Clean up after build
 
-Cleanup the work directory for self hosted runners after they finish building.
+Clean up the work directory for self hosted runners after they finish building.
 
 ## Example usage
 
 ```yaml
-- uses: mickem/clean-after-action@v1
+- uses: FraBle/clean-after-action@v1
 ```
 
 It is important that this is run before any caching tasks as cleanups are run in reverse order (and you do not want to cleanup before the caching is saved).
 
 A more full example:
+
 ```yaml
 jobs:
   build:
     runs-on: onprem
     steps:
-    - uses: mickem/clean-after-action@v1
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
-    # ....
+    - uses: FraBle/clean-after-action@v1
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+    # ...
 ```
+
 ## Inputs
 
-### keepGit
+### `keep-git`
 
 Set this to true to prevent the `.git ` folder to be deleted.
 
 ```yaml
-- uses: mickem/clean-after-action@v1
+- uses: FraBle/clean-after-action@v1
   with:
-    keepGit: true
+    keep-git: true
 ```
 
-## What about docker actions?
+## What about Docker Actions?
 
-If you use docker actions files will be created by "root" and this action will fail to delete generated files.
+If you use Docker Actions, files will be created by "root" and this action will fail to delete generated files.
 
 This can be solved by forcing docker containers to run as the same user as the user which runs your self hosted runner.
 [To do this you can use the user-remap feature in docker](https://docs.docker.com/engine/security/userns-remap/).
@@ -47,4 +49,3 @@ The main problem with running clean up as a build step is that it will run "befo
 This will effectively break things like caching and similar things which require files to be left when their cleanup runs.
 
 A similar argument can be made for running cleanup before you build, this means the disk will eventually become full as more and more projects build.
-  
