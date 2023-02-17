@@ -1,6 +1,6 @@
 {
   "name": "clean-after-action",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "index.js",
   "author": "Michael Medin <michael@medin.name>",
   "contributors": [

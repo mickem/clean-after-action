@@ -1,4 +1,4 @@
-name: 'Clean after'
+name: 'Clean workspace post step'
 description: 'Cleans up the workspace after build finishes'
 author: 'mickem / FraBle'
 branding:
