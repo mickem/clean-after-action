@@ -2,12 +2,16 @@
 
 on: [pull_request, push]
 
+permissions:
+  contents: write
+
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install
         run: npm ci
 
@@ -17,33 +21,23 @@ jobs:
     if: contains(github.ref, 'tags/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Get Version
-        id: get_tag
-        run: echo ::set-output name=version::${TAG_REF_NAME##*/}
-        env:
-          TAG_REF_NAME: ${{ github.ref }}
       - name: Release GitHub Actions
-        uses: technote-space/release-github-actions@v6
+        uses: technote-space/release-github-actions@v8
         with:
           BRANCH_NAME: releases/${MAJOR}
           CLEAN_TARGETS: '.gitignore,.github,*.lock,*.json'
-          COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
+          COMMIT_MESSAGE: 'Build: release ${{ github.ref_name }} via ${{ github.sha }}'
 
-  testRelease:
+  test-release:
     name: Test release
     needs: [build]
     if: contains(github.ref, 'tags/test/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Get Version
-        id: get_tag
-        run: echo ::set-output name=version::${TAG_REF_NAME##*/}
-        env:
-          TAG_REF_NAME: ${{ github.ref }}
       - name: Release GitHub Actions
-        uses: technote-space/release-github-actions@v6
+        uses: technote-space/release-github-actions@v8
         with:
           BRANCH_NAME: releases/${MAJOR}
           TEST_TAG_PREFIX: test/
           CLEAN_TARGETS: '.gitignore,.github,*.lock,*.json'
-          COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
+          COMMIT_MESSAGE: 'Build: release ${{ github.ref_name }} via ${{ github.sha }}'

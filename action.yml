@@ -5,9 +5,10 @@ branding:
   icon: 'delete'
   color: 'red'
 inputs:
-  keepGit:
+  keep-git:
     description: 'Keep the .git folder to speedup cloning'
-    required: false
+    default: false
+    type: boolean
 runs:
   using: 'node16'
   main: 'index.js'
