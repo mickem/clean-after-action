@@ -1,49 +1,83 @@
-﻿name: Build
+name: Build
 
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+      - 'test/v*'
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  test:
+    name: Test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # node24 is what the action declares in action.yml, node22 is kept so the
+        # sources stay runnable on the previous LTS.
+        node: ['22', '24']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm run test:coverage
+
+  self-test:
+    name: Self test
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install
-        run: npm ci
+        uses: actions/checkout@v7
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install runtime dependencies
+        run: npm ci --omit=dev
+      # Runs the action exactly as a consumer would. Its post step cleans this workspace when
+      # the job ends and fails the job if the declared runtime or the code does not work.
+      - name: Clean after
+        uses: ./
+        with:
+          keepGit: true
+      - name: Produce something to clean up
+        run: |
+          mkdir -p build
+          echo artifact > build/artifact.bin
 
   release:
     name: Release
-    needs: [build]
-    if: contains(github.ref, 'tags/v')
+    needs: [test, self-test]
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/test/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Get Version
-        id: get_tag
-        run: echo ::set-output name=version::${TAG_REF_NAME##*/}
-        env:
-          TAG_REF_NAME: ${{ github.ref }}
-      - name: Release GitHub Actions
-        uses: technote-space/release-github-actions@v6
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup node
+        uses: actions/setup-node@v7
         with:
-          BRANCH_NAME: releases/${MAJOR}
-          CLEAN_TARGETS: '.gitignore,.github,*.lock,*.json'
-          COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
-
-  testRelease:
-    name: Test release
-    needs: [build]
-    if: contains(github.ref, 'tags/test/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Version
-        id: get_tag
-        run: echo ::set-output name=version::${TAG_REF_NAME##*/}
+          node-version: '24'
+          cache: npm
+      - name: Install runtime dependencies
+        run: npm ci --omit=dev
+      - name: Publish release branch and tags
+        run: scripts/release.sh
         env:
-          TAG_REF_NAME: ${{ github.ref }}
-      - name: Release GitHub Actions
-        uses: technote-space/release-github-actions@v6
-        with:
-          BRANCH_NAME: releases/${MAJOR}
-          TEST_TAG_PREFIX: test/
-          CLEAN_TARGETS: '.gitignore,.github,*.lock,*.json'
-          COMMIT_MESSAGE: 'build: release ${{ steps.get_tag.outputs.version }} via ${{ github.sha }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

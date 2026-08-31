@@ -1,15 +1,28 @@
 {
   "name": "cleanup-after",
-  "version": "1.1.1",
+  "version": "2.1.0",
+  "description": "GitHub Action that cleans the workspace of a self hosted runner after the job finishes",
+  "type": "module",
   "main": "index.js",
   "author": "Michael Medin <michael@medin.name>",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude='test/**' --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 test/*.test.js"
+  },
   "dependencies": {
-    "@actions/core": "1.2.3",
-    "@actions/io": "^1.0.2"
+    "@actions/core": "^3.0.1",
+    "@actions/io": "^3.0.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/mickem/clean-after-action.git"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/mickem/clean-after-action/issues"
+  },
+  "homepage": "https://github.com/mickem/clean-after-action#readme"
 }

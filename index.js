@@ -1,1 +1,3 @@
-console.log('Scheduling cleanup at end');
+import * as core from '@actions/core';
+
+core.info('Scheduling cleanup at end');
