@@ -55,6 +55,11 @@ jobs:
         uses: ./
         with:
           keepGit: true
+          # Exercises the paths input on a real runner too: node_modules is kept by the
+          # exclusion, .git by keepGit, everything else in the workspace goes.
+          paths: |
+            *
+            !node_modules
       - name: Produce something to clean up
         run: |
           mkdir -p build

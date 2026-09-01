@@ -3,7 +3,25 @@
 Release notes for earlier versions are on the
 [releases page](https://github.com/mickem/clean-after-action/releases).
 
-## 2.1.0 (unreleased)
+## 2.2.0 (unreleased)
+
+### Added
+
+- **A `paths` input** to clean up only part of the workspace: glob patterns relative to the
+  workspace, one per line, with `!` prefixed patterns keeping what they match
+  ([#1](https://github.com/mickem/clean-after-action/issues/1)). The default is `*`, which is
+  everything in the workspace, so workflows that do not set it are unaffected.
+- The action now refuses to delete the workspace directory itself and warns instead, which
+  makes a `paths: .` pattern a no-op rather than a way to wipe out everything the other
+  patterns excluded.
+
+### Changed
+
+- Matching goes through `@actions/glob` (a new runtime dependency) rather than a plain
+  directory listing. It does not follow symlinks, which keeps the cleanup inside the workspace
+  and means the default still deletes dot files and broken symlinks exactly as before.
+
+## 2.1.0
 
 ### Fixed
 
