@@ -21,10 +21,10 @@ async function workspace(entries) {
 }
 
 /** Runs one of the action entry points the way the runner does: `node <file>`. */
-function runEntryPoint(file, { cwd, keepGit }) {
+function runEntryPoint(file, { cwd, keepGit, paths }) {
   return execFileAsync(process.execPath, [path.join(root, file)], {
     cwd,
-    env: { ...process.env, INPUT_KEEPGIT: keepGit ?? '' },
+    env: { ...process.env, INPUT_KEEPGIT: keepGit ?? '', INPUT_PATHS: paths ?? '' },
   });
 }
 
@@ -76,6 +76,40 @@ describe('action entry points', () => {
     await runEntryPoint('cleanup.js', { cwd: directory });
 
     assert.deepEqual(await list(directory), []);
+  });
+
+  test('cleanup.js cleans only the paths it is given', async () => {
+    const directory = await workspace({
+      'file.txt': 'hello',
+      build: { 'artifact.bin': 'binary' },
+      cache: { 'entry.bin': 'binary' },
+    });
+
+    const { stdout } = await runEntryPoint('cleanup.js', { cwd: directory, paths: 'build' });
+
+    assert.match(stdout, /Deleting build/);
+    assert.match(stdout, /Finished, deleted 1 entries/);
+    assert.deepEqual(await list(directory), ['cache', 'file.txt']);
+  });
+
+  test('cleanup.js honours a ! exclusion in paths', async () => {
+    const directory = await workspace({
+      'file.txt': 'hello',
+      '.git': { HEAD: 'ref: refs/heads/master' },
+    });
+
+    await runEntryPoint('cleanup.js', { cwd: directory, paths: '*\n!.git' });
+
+    assert.deepEqual(await list(directory), ['.git']);
+  });
+
+  test('cleanup.js refuses to delete the workspace itself', async () => {
+    const directory = await workspace({ 'file.txt': 'hello' });
+
+    const { stdout } = await runEntryPoint('cleanup.js', { cwd: directory, paths: '.' });
+
+    assert.match(stdout, /::warning::Refusing to delete the workspace itself/);
+    assert.deepEqual(await list(directory), ['file.txt']);
   });
 
   test('run() fails the step instead of throwing when cleaning fails', async () => {

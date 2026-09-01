@@ -1,6 +1,6 @@
 {
   "name": "cleanup-after",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "GitHub Action that cleans the workspace of a self hosted runner after the job finishes",
   "type": "module",
   "main": "index.js",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
+    "@actions/glob": "^0.7.0",
     "@actions/io": "^3.0.2"
   },
   "repository": {
