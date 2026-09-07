@@ -43,6 +43,39 @@ Set this to true to prevent the `.git` folder to be deleted.
 The input is off unless it is set: `false`, `0`, `no`, `n`, `off` and an empty value keep the
 default behaviour of deleting everything, any other value keeps the `.git` folder.
 
+### paths
+
+By default everything in the workspace is deleted. Set `paths` to clean up only part of it:
+glob patterns relative to the workspace, one per line. Prefix a pattern with `!` to keep what
+it matches.
+
+```yaml
+- uses: mickem/clean-after-action@v2
+  with:
+    paths: |
+      build
+      *.log
+```
+
+Keeping something is the `!` form, so this deletes everything except the `.git` folder (the
+same thing `keepGit: true` does):
+
+```yaml
+- uses: mickem/clean-after-action@v2
+  with:
+    paths: |
+      *
+      !.git
+```
+
+Note that `*` means "everything in the workspace", including dot files. Do **not** use `.` for
+that: `.` matches the workspace directory itself, so it would delete the workspace along with
+anything a later `!` pattern was meant to keep. The action refuses to do that and warns
+instead, but `*` is what you want.
+
+`keepGit: true` still works alongside `paths` and always wins, so `.git` survives regardless of
+what the patterns match.
+
 ## What about docker actions?
 
 If you use docker actions files will be created by "root" and this action will fail to delete generated files.
